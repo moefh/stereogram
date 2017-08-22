@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Simple Example - Single Image Stereogram</title>
+</head>
+<body onload="init()">
+<!-- <script src="js/three.js"></script> -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script>
+<script src="js/stereo_three.js"></script>
+<div id="content"></div>
+
+<script>
+var stop = false;
+
+function abort() { stop = true; }
+
+function init() {
+  var width = 800;
+  var height = 450;
+
+  // setup a Three.js renderer as usual
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize(width, height);
+  document.body.appendChild(renderer.domElement);
+
+  // create a stereogram renderer
+  var stereo = new Stereogram.Renderer(width, height);
+  stereo.setDepthFactor(1/50);
+
+  // load the depth map
+  var depth_map = THREE.ImageUtils.loadTexture("textures/depth_shark.jpg");
+
+  // load the background texture (the dimensions of this texture must be powers of 2)
+  var tile_texture = THREE.ImageUtils.loadTexture("textures/tile.png");
+  tile_texture.wrapS = THREE.RepeatWrapping;
+  tile_texture.wrapT = THREE.RepeatWrapping;
+  stereo.setBackgroundMode(Stereogram.BG_TILE);
+  stereo.setBackgroundTileTexture(tile_texture);
+  stereo.setBackgroundTileScroll(0.5, 0.5);
+
+  // render the stereogram
+  var render = function() {
+    if (! stop)
+      requestAnimationFrame(render);
+    stereo.render(renderer, depth_map);
+  };
+  render();
+}
+
+</script>
+
+</body>
+</html>

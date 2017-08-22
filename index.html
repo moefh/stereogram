@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Single Image Stereogram</title>
+<style>
+body, canvas { margin: 0; border: 0; padding: 0; }
+pre { padding: 0 2em 0 2em; }
+#explanation { padding: 0 1em 0 1em; width: 40em; font-size: 24px; }
+</style>
+</head>
+<body onload="init()">
+
+<!-- <script src="js/three.js"></script> -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/fps.js"></script>
+<script src="js/stereo_three.js"></script>
+<script src="js/main.js"></script>
+
+<script type="x-shader/x-vertex" id="vertexshader">
+attribute vec3 position;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+void main(void) {
+  gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);
+}
+</script>
+<script type="x-shader/x-fragment" id="fragmentshader">
+void main(void) {
+  highp float depth = clamp(90.0 * (1.0 - gl_FragCoord.z), 0.5, 1.5) - 0.5;
+  gl_FragColor = vec4(depth, depth, depth, 1.0);
+}
+</script>
+
+<div id="content"></div>
+
+<input type="button" value="640x360" onclick="set_render_size(640,360)">
+<input type="button" value="800x450" onclick="set_render_size(800,450)">
+<input type="button" value="1280x720" onclick="set_render_size(1280,720)">
+<input type="button" value="1600x900" onclick="set_render_size(1600,900)">
+&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" value="Custom:" onclick="set_render_size(parseInt(document.getElementById('width').value),parseInt(document.getElementById('height').value))">
+<input type="text" id="width" size="5" value="1024">x<input type="text" id="height" size="5" value="576">
+<script>
+document.getElementById("width").value = window.innerWidth - 20;
+document.getElementById("height").value = window.innerHeight;
+</script>
+
+<pre>
+
+*** Keys ***
+
+S   toggle between stereogram and depth map
+T   toggle between background texture and noise
+F   toggle framerate display
+A   toggle animation
+B   toggle background movement
+</pre>
+
+<div id="explanation">
+<h1>Explanation</h1>
+
+<p>This page renders a depth map of a cube (which can be seen by
+pressing "<tt>S</tt>"), and then renders this depth map as
+a <a href="https://en.wikipedia.org/wiki/Autostereogram">single image
+stereogram</a>.
+
+<p>All calculations are done by WebGL shaders.
+
+<p>You can make the cube move by pressing "<tt>A</tt>", but it gets
+hard to keep seeing the stereogram. For best results, try using
+animated noise as the background (press "<tt>T</tt>" and
+"<tt>B</tt>").
+
+<p>
+Uses WebGL and <a href="http://threejs.org/">Three.js</a>, JavaScript 3D library
+</div>
+
+</body>
+</html>

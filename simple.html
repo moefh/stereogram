@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Simple Example - Single Image Stereogram</title>
+</head>
+<body onload="init()">
+<script src="js/stereogram.js"></script>
+
+<script>
+var stop = false;
+
+function abort() { stop = true; }
+
+function create_canvas(width, height) {
+    var canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    document.body.appendChild(canvas);
+
+    var gl = canvas.getContext("webgl");
+    if (! gl)
+      throw "Could not initialise WebGL";
+    gl.viewportWidth = canvas.width;
+    gl.viewportHeight = canvas.height;
+
+    return gl;
+}
+
+function init() {
+    var width = 800;
+    var height = 450;
+
+    var gl = create_canvas(width, height);
+    
+    // create a stereogram renderer
+    var stereo = new Stereogram.Renderer(gl, width, height);
+    stereo.setDepthFactor(1/50);
+    
+    var depth_map = Stereogram.Util.load_texture(gl, "textures/depth_shark.jpg");;
+    var tile = Stereogram.Util.load_texture(gl, "textures/tile.png");;
+    stereo.setBackgroundTileTexture(tile);
+    stereo.setBackgroundMode(Stereogram.BG_TILE);
+    stereo.setBackgroundTileScroll(0.5, 0.5);
+
+    // render the stereogram
+    var render = function() {
+        if (! stop)
+            requestAnimationFrame(render);
+        stereo.render(depth_map);
+    };
+    render();
+}
+</script>
+
+</body>
+</html>
